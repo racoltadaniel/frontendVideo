@@ -5,34 +5,115 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Video Generator</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f5f5f5;
+        #loadingBar {
+            width: 0;
+            height: 20px;
+            background-color: green;
+            display: none;
         }
-        #status {
-            margin-top: 20px;
+        #downloadButton {
+            display: none;
         }
     </style>
 </head>
 <body>
-
-    <h1>Generate Your Video</h1>
-
-    <input type="text" id="inputText" placeholder="Enter your text here" />
-
+    <input type="text" id="inputText" placeholder="Enter text here">
     <button id="generateButton">Generate Video</button>
+    <div id="status"></div>
+    <div id="loadingBar"></div>
+    <button id="downloadButton">Download Video</button>
 
-    <p id="status"></p>
+    <script>
+        document.getElementById('generateButton').addEventListener('click', async function () {
+            const inputText = document.getElementById('inputText').value;
+            const statusElement = document.getElementById('status');
+            const loadingBar = document.getElementById('loadingBar');
+            const downloadButton = document.getElementById('downloadButton');
 
-    <button id="downloadButton" style="display: none;">Download Video</button>
+            if (!inputText.trim()) {
+                alert('Please enter some text!');
+                return;
+            }
 
-    <script src="app.js"></script>
+            statusElement.innerText = 'Generating video, please wait...';
 
+            try {
+                // Call your API to generate the video
+                const response = await fetch('http://localhost:3000/generate-video', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ text: inputText })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Error generating video');
+                }
+
+                // Assuming the API returns an ID for the video
+                const data = await response.json();
+                const videoId = data.jobId;
+
+                // Display the loading bar for 20 seconds
+                loadingBar.style.display = 'block';
+                let width = 0;
+                const intervalId = setInterval(() => {
+                    width += 100 / 20; // 100% / 20 seconds
+                    loadingBar.style.width = width + '%';
+                    if (width >= 100) {
+                        clearInterval(intervalId);
+                        loadingBar.style.display = 'none';
+                        checkVideoStatus(videoId);
+                    }
+                }, 1000); // Update every second
+
+            } catch (error) {
+                console.error('Error:', error);
+                statusElement.innerText = 'Failed to generate video.';
+            }
+        });
+
+        async function checkVideoStatus(videoId) {
+            const statusElement = document.getElementById('status');
+            const downloadButton = document.getElementById('downloadButton');
+
+            const intervalId = setInterval(async () => {
+                try {
+                    const response = await fetch(`http://localhost:3000/video-status/${videoId}`);
+                    if (!response.ok) {
+                        throw new Error('Error checking video status');
+                    }
+
+                    const data = await response.json();
+                    const videoStatus = data.state;
+
+                    if (videoStatus === 'ready') {
+                        clearInterval(intervalId);
+
+                        // Set the download button to download the video
+                        downloadButton.style.display = 'block';
+                        downloadButton.addEventListener('click', function () {
+                            const videoUrl = `http://localhost:3000/video/${videoId}`;
+                            const a = document.createElement('a');
+                            a.href = videoUrl;
+                            a.download = 'generated-video.mp4';
+                            a.click();
+                        });
+
+                        statusElement.innerText = 'Video is ready!';
+
+                    } else if (videoStatus === 'error') {
+                        clearInterval(intervalId);
+                        statusElement.innerText = 'Failed to generate video.';
+                    }
+
+                } catch (error) {
+                    console.error('Error:', error);
+                    statusElement.innerText = 'Error checking video status.';
+                }
+            }, 1000); // Check every second
+        }
+    </script>
 </body>
 </html>

@@ -12,7 +12,7 @@ document.getElementById('generateButton').addEventListener('click', async functi
 
     try {
         // Call your API to generate the video
-        const response = await fetch('http://your-vm-ip:3000/generate-video', {
+        const response = await fetch('http://localhost:3000/generate-video', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
