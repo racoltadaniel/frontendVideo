@@ -100,22 +100,7 @@
     <button id="downloadButton">View Video</button>
 
     <script>
-        let apiUrl = '';
-
-        async function fetchConfig() {
-            try {
-                const response = await fetch('http://localhost:3000/config'); // Your config endpoint
-                if (!response.ok) {
-                    throw new Error('Error fetching config');
-                }
-                const config = await response.json();
-                apiUrl = config.api_url; // Assume the properties file contains 'api_url' key
-            } catch (error) {
-                console.error('Error:', error);
-            }
-        }
-
-        fetchConfig();
+        let apiUrl = 'http://localhost:3000';
 
         document.getElementById('generateButton').addEventListener('click', async function () {
             const inputText = document.getElementById('inputText').value;
