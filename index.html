@@ -100,6 +100,23 @@
     <button id="downloadButton">View Video</button>
 
     <script>
+        let apiUrl = '';
+
+        async function fetchConfig() {
+            try {
+                const response = await fetch('http://localhost:3000/config'); // Your config endpoint
+                if (!response.ok) {
+                    throw new Error('Error fetching config');
+                }
+                const config = await response.json();
+                apiUrl = config.api_url; // Assume the properties file contains 'api_url' key
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        fetchConfig();
+
         document.getElementById('generateButton').addEventListener('click', async function () {
             const inputText = document.getElementById('inputText').value;
             const statusElement = document.getElementById('status');
@@ -115,7 +132,7 @@
 
             try {
                 // Call your API to generate the video
-                const response = await fetch('http://localhost:3000/generate-video', {
+                const response = await fetch(`${apiUrl}/generate-video`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -151,7 +168,7 @@
 
             const intervalId = setInterval(async () => {
                 try {
-                    const response = await fetch(`http://localhost:3000/video-status/${videoId}`);
+                    const response = await fetch(`${apiUrl}/video-status/${videoId}`);
                     if (!response.ok) {
                         throw new Error('Error checking video status');
                     }
@@ -166,7 +183,7 @@
                         document.getElementById('loadingBar').style.display = 'none';
                         downloadButton.style.display = 'block';
                         downloadButton.addEventListener('click', function () {
-                            const videoUrl = `http://localhost:3000/video/${videoId}`;
+                            const videoUrl = `${apiUrl}/video/${videoId}`;
                             window.open(videoUrl, '_blank'); // Open in a new tab
 
                             // Reset the page to its initial state
