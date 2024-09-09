@@ -19,11 +19,11 @@
             font-size: 18px;
             margin-bottom: 10px;
             width: 100%;
-            max-width: 600px; /* Increased width */
-            height: 150px; /* Increased height for more rows */
+            max-width: 600px;
+            height: 150px;
             border: 2px solid #ccc;
             border-radius: 5px;
-            resize: vertical; /* Allows vertical resizing */
+            resize: vertical;
         }
 
         #generateButton, #downloadButton {
@@ -52,14 +52,14 @@
 
         #loadingBar {
             width: 100%;
-            max-width: 600px; /* Increased width */
+            max-width: 600px;
             height: 20px;
             background-color: #ddd;
             border-radius: 5px;
             overflow: hidden;
             position: relative;
             margin-bottom: 20px;
-            display: none; /* Initially hidden */
+            display: none;
         }
 
         #loadingBar:before {
@@ -73,22 +73,21 @@
             animation: loading 2s infinite;
         }
 
-        @keyframes loading {
-            0% {
-                left: -100%;
-            }
-            50% {
-                left: 0;
-            }
-            100% {
-                left: 100%;
-            }
-        }
-
         #loadingText {
             text-align: center;
             font-size: 16px;
             color: #333;
+        }
+
+        #videoContainer {
+            display: none;
+            margin-top: 20px;
+        }
+
+        video {
+            max-width: 100%;
+            width: 600px;
+            height: auto;
         }
     </style>
 </head>
@@ -98,6 +97,9 @@
     <div id="status"></div>
     <div id="loadingBar"><div id="loadingText">Processing...</div></div>
     <button id="downloadButton">View Video</button>
+    <div id="videoContainer">
+        <video id="videoPlayer" controls></video>
+    </div>
 
     <script>
         let apiUrl = 'http://localhost:3000';
@@ -116,7 +118,6 @@
             statusElement.innerText = 'Generating video, please wait...';
 
             try {
-                // Call your API to generate the video
                 const response = await fetch(`${apiUrl}/generate-video`, {
                     method: 'POST',
                     headers: {
@@ -129,11 +130,9 @@
                     throw new Error('Error generating video');
                 }
 
-                // Assuming the API returns an ID for the video
                 const data = await response.json();
                 const videoId = data.jobId;
 
-                // Display the loading bar and hide the download button
                 loadingBar.style.display = 'block';
                 document.getElementById('loadingText').innerText = 'Processing...';
                 downloadButton.style.display = 'none';
@@ -143,7 +142,7 @@
             } catch (error) {
                 console.error('Error:', error);
                 statusElement.innerText = 'Failed to generate video.';
-                loadingBar.style.display = 'none'; // Hide loading bar on error
+                loadingBar.style.display = 'none';
             }
         });
 
@@ -164,17 +163,19 @@
                     if (videoStatus === 'ready') {
                         clearInterval(intervalId);
 
-                        // Hide the loading bar and show the download button
                         document.getElementById('loadingBar').style.display = 'none';
                         downloadButton.style.display = 'block';
+
                         downloadButton.addEventListener('click', function () {
                             const videoUrl = `${apiUrl}/video/${videoId}`;
-                            window.open(videoUrl, '_blank'); // Open in a new tab
+                            const videoPlayer = document.getElementById('videoPlayer');
+                            const videoContainer = document.getElementById('videoContainer');
 
-                            // Reset the page to its initial state
+                            videoPlayer.src = videoUrl;
+                            videoContainer.style.display = 'block';
+
                             document.getElementById('inputText').value = '';
                             statusElement.innerText = '';
-                            loadingBar.style.display = 'none';
                             downloadButton.style.display = 'none';
                         });
 
@@ -190,7 +191,7 @@
                     console.error('Error:', error);
                     statusElement.innerText = 'Error checking video status.';
                 }
-            }, 2000); // Check every 2 seconds
+            }, 2000);
         }
     </script>
 </body>
