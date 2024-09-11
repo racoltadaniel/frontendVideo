@@ -108,8 +108,8 @@
         <option value="Indonesian-Male">Indonesian-Male</option>
         <option value="English-Female">English-Female</option>
         <option value="English-Male">English-Male</option>
-        <option value="English-Male">Romanian-Female</option>
-        <option value="English-Male">Romanian-Male</option>
+        <option value="Romanian-Female">Romanian-Female</option>
+        <option value="Romanian-Male">Romanian-Male</option>
     </select>
     <button id="generateButton">Generate Video</button>
     <div id="status"></div>
@@ -120,7 +120,7 @@
     </div>
 
     <script>
-        let apiUrl = 'http://localhost:3000';
+        let apiUrl = 'http://104.154.18.51:3000';
 
         document.getElementById('generateButton').addEventListener('click', async function () {
             const inputText = document.getElementById('inputText').value;
