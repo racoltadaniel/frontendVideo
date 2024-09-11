@@ -14,7 +14,7 @@
             background-color: #f4f4f4;
         }
 
-        #inputText {
+        #inputText, #youtubeLink {
             padding: 15px;
             font-size: 18px;
             margin-bottom: 10px;
@@ -103,6 +103,8 @@
 </head>
 <body>
     <textarea id="inputText" placeholder="Enter text here"></textarea>
+    <label for="youtubeLink">YouTube Link for Audio (optional):</label>
+    <input type="text" id="youtubeLink" placeholder="Enter YouTube link here">
     <select id="languageSelect">
         <option value="Indonesian-Female">Indonesian-Female</option>
         <option value="Indonesian-Male">Indonesian-Male</option>
@@ -124,6 +126,7 @@
 
         document.getElementById('generateButton').addEventListener('click', async function () {
             const inputText = document.getElementById('inputText').value;
+            const youtubeLink = document.getElementById('youtubeLink').value.trim();
             const language = document.getElementById('languageSelect').value;
             const statusElement = document.getElementById('status');
             const loadingBar = document.getElementById('loadingBar');
@@ -137,12 +140,23 @@
             statusElement.innerText = 'Generating video, please wait...';
 
             try {
+                // Prepare the request payload
+                const payload = {
+                    text: inputText,
+                    language: language,
+                };
+
+                // Add youtubeLink only if it's not empty
+                if (youtubeLink) {
+                    payload.youtubeLink = youtubeLink;
+                }
+
                 const response = await fetch(`${apiUrl}/generate-video`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ text: inputText, language: language })
+                    body: JSON.stringify(payload)
                 });
 
                 if (!response.ok) {
