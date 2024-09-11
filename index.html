@@ -14,7 +14,7 @@
             background-color: #f4f4f4;
         }
 
-        #inputText, #youtubeLink {
+        #inputText, #youtubeLink, #volumeInput {
             padding: 15px;
             font-size: 18px;
             margin-bottom: 10px;
@@ -30,6 +30,12 @@
         }
 
         #youtubeLink {
+            width: 100%;
+            max-width: 600px;
+            height: 40px; /* Adjust height for a single line of text */
+        }
+
+        #volumeInput {
             width: 100%;
             max-width: 600px;
             height: 40px; /* Adjust height for a single line of text */
@@ -114,6 +120,8 @@
     <textarea id="inputText" placeholder="Enter text here"></textarea>
     <label for="youtubeLink">YouTube Link for Audio (optional):</label>
     <input type="text" id="youtubeLink" placeholder="Enter YouTube link here">
+    <label for="volumeInput">Volume (optional, default 0.05):</label>
+    <input type="number" id="volumeInput" placeholder="Enter volume" step="0.01" min="0" value="0.05">
     <select id="languageSelect">
         <option value="Indonesian-Female">Indonesian-Female</option>
         <option value="Indonesian-Male">Indonesian-Male</option>
@@ -136,6 +144,7 @@
         document.getElementById('generateButton').addEventListener('click', async function () {
             const inputText = document.getElementById('inputText').value;
             const youtubeLink = document.getElementById('youtubeLink').value.trim();
+            const volume = parseFloat(document.getElementById('volumeInput').value) || 0.05;
             const language = document.getElementById('languageSelect').value;
             const statusElement = document.getElementById('status');
             const loadingBar = document.getElementById('loadingBar');
@@ -153,6 +162,7 @@
                 const payload = {
                     text: inputText,
                     language: language,
+                    volume: volume // Add volume to the payload
                 };
 
                 // Add youtubeLink only if it's not empty
