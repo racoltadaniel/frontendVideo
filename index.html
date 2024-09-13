@@ -48,7 +48,7 @@
             font-size: 18px;
             border: 2px solid #ccc;
             border-radius: 5px;
-            width: 80px; /* Adjust width for 5 characters */
+            width: 80px;
         }
 
         #languageSelect {
@@ -134,6 +134,13 @@
         <label for="volumeInput" style="margin-left: 10px;">Volume (optional, default 0.05):</label>
         <input type="number" id="volumeInput" placeholder="0.05" step="0.01" min="0" value="0.05">
     </div>
+
+    <!-- New Checkbox -->
+    <div id="checkboxContainer" style="margin-bottom: 10px;">
+        <input type="checkbox" id="firstCaptionFull">
+        <label for="firstCaptionFull">First caption full sentence</label>
+    </div>
+
     <select id="languageSelect">
         <option value="Indonesian-Female">Indonesian-Female</option>
         <option value="Indonesian-Male">Indonesian-Male</option>
@@ -158,6 +165,7 @@
             const youtubeLink = document.getElementById('youtubeLink').value.trim();
             const volume = parseFloat(document.getElementById('volumeInput').value) || 0.05;
             const language = document.getElementById('languageSelect').value;
+            const firstCaptionFull = document.getElementById('firstCaptionFull').checked; // Get the checkbox value
             const statusElement = document.getElementById('status');
             const loadingBar = document.getElementById('loadingBar');
             const downloadButton = document.getElementById('downloadButton');
@@ -174,7 +182,8 @@
                 const payload = {
                     text: inputText,
                     language: language,
-                    volume: volume // Add volume to the payload
+                    volume: volume, // Add volume to the payload
+                    firstCaptionFull: firstCaptionFull // Add checkbox value to the payload
                 };
 
                 // Add youtubeLink only if it's not empty
